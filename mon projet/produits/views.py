@@ -1,21 +1,31 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import ProduitForm
+from .forms import ProduitForm, ClientForm, FournisseurForm
 from django.contrib import messages
+from django.views.decorators.http import require_POST
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
+from .models import Produit, Fournisseur, Client, Vente 
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, Count, Max
 
 # Vues de simple affichage pour le moment : chaque vue ne fait
 # qu'afficher son template (aucune donnee de la base pour l'instant,
 # ca viendra avec l'integration Django).
-
+@login_required
 def home(request):
     return render(request, 'home.html')
 
-
+@login_required
 def produits_liste(request):
-    return render(request, 'produits/liste.html')
+    produits = Produit.objects.select_related('categorie').annotate(
+        total_ventes = Sum('Lignes_vente__quantite')
+    )
+    return render(request, 'produits/liste.html', {'produits': produits})
 
-
+@login_required
 def produits_form(request,pk=None):
-    produit = get_object_or_404(Produit,pk=pk) if pk else None
+    produit = get_object_or_404(Produit, pk=pk) if pk else None
     if request.method == 'POST':
         form = ProduitForm(request.POST, request.FILES, instance=produit)
         if form.is_valid():
@@ -26,11 +36,19 @@ def produits_form(request,pk=None):
     else:
         form = ProduitForm(instance=produit)  
 
-    return render(request, 'produits/formulaire.html', {'form': form, 'produit': produit})          
+    return render(request, 'produits/form.html', {'form': form, 'produit': produit})
+@require_POST
+@login_required
+def produits_delete(request,pk):
+    produit = get_object_or_404(Produit, pk=pk)  
+    produit.delete()
+    messages.success(request, "Produit Suprimer avec success")
+    return redirect('produit_liste')       
 
 
 def stock_liste(request):
-    return render(request, 'stock/liste.html')
+    produit = Produit.objects.all()
+    return render(request, 'stock/liste.html', {'produits': produit})
 
 
 def ventes_liste(request):
@@ -40,29 +58,74 @@ def ventes_liste(request):
 def ventes_form(request):
     return render(request, 'ventes/form.html')
 
-
+@login_required
 def clients_liste(request):
-    return render(request, 'clients/liste.html')
+    client = Client.objects.annotate(
+        nb_achatss = Count('ventes'),
+        dernier_achat = Max('ventes__date')
+    )
+    return render(request, 'clients/liste.html', {'clients': client})
 
+@login_required
+def clients_form(request, pk=None):
+    client = get_object_or_404(Client, pk=pk) if pk else None
+    if request.method == 'POST':
+        form = ClientForm(request.POST, instance=client)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Client enregistré.")
+            return redirect('clients_liste')
+    else:
+        form = ClientForm(instance=client)    
+    return render(request, 'clients/form.html', {'form': form, 'client': client})
 
-def clients_form(request):
-    return render(request, 'clients/form.html')
+@require_POST
+@login_required
+def clients_delete(request, pk):
+    client = get_object_or_404(Client, pk=pk)
+    client.delete()
+    messages.success(request, "Client supprimer.")
+    return redirect('clients_liste')
 
-
+@login_required
 def fournisseurs_liste(request):
-    return render(request, 'fournisseurs/liste.html')
+    fournisseurs = Fournisseur.objects.all()
+    return render(request, 'fournisseurs/liste.html', {'fournisseur': fournisseurs})
 
+@login_required
+def fournisseurs_form(request, pk=None):
+    fournisseurs = get_object_or_404(Fournisseur, pk=pk) if pk else None
+    if request.method == 'POST':
+        form = FournisseurForm(request.POST, instance=fournisseurs)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Fournisseur enregistre")
+            return redirect('fournisseurs_liste')
+    else:
+        form = FournisseurForm(instance=fournisseurs) 
+    return render(request, 'fournisseurs/form.html', {'form': form, 'fournisseur': fournisseurs})
 
-def fournisseurs_form(request):
-    return render(request, 'fournisseurs/form.html')
+@require_POST
+@login_required
+def fournisseurs_delete(request, pk):
+    fournisseur = get_object_or_404(Fournisseur, pk=pk)
+    fournisseur.delete()
+    messages.success(request, "Founisseur supprimer.")
+    return redirect('fournisseurs_liste')
 
-
+@login_required
 def factures_liste(request):
-    return render(request, 'factures/liste.html')
+    vente = Vente.objects.all()
+    return render(request, 'factures/liste.html', {'ventes': vente})
 
-
-def factures_detail(request, pk):
-    return render(request, 'factures/detail.html')
+@login_required
+def factures_detail(request, pk=None):
+    vente = get_object_or_404(Vente, pk=pk) if pk else None   
+    if request.method == 'POST':
+        ligne = Vente(request.POST,)
+    else:
+        ligne = Vente() 
+    return render(request, 'factures/detail.html', {'lignes': ligne, 'ventes': vente})
 
 
 def statistiques(request):
@@ -78,5 +141,21 @@ def parametres(request):
 
 
 def login(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            auth_login(request,user)
+            return redirect ('home')
+        messages.error(request, "Mot de passe d\'utilisateur incorect")
+    
     return render(request, 'auth/login.html')
 
+def logout_view(request):
+    auth_logout(request)
+    messages.success(request, "Vous etes deconnecté.")
+    return redirect('login')

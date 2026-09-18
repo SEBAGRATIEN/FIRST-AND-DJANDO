@@ -146,7 +146,7 @@ class Vente(models.Model):
       return sum(ligne.quantite for ligne in self.lignes.all())
 
 class LigneVente(models.Model):
-    Vente = models.ForeignKey(Vente, on_delete=models.CASCADE, related_name='lignes')   
+    vente = models.ForeignKey(Vente, on_delete=models.CASCADE, related_name='lignes')   
     produit = models.ForeignKey(Produit, on_delete=models.PROTECT, related_name='Lignes_vente')
     quantite = models.PositiveIntegerField(default=1)
     prix_unitaire = models.DecimalField("Prix de la vente en (£)" ,max_digits=10, decimal_places=2)
