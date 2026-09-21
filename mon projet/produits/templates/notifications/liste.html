@@ -16,51 +16,54 @@
 
   <div class="panel">
     <ul class="simple-list">
+      {% for alertes in alertes %} {% if alertes.peremption_proche %}
       <li class="simple-list-item">
         <div class="simple-list-icon danger">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </div>
         <div class="simple-list-content">
-          <p class="simple-list-title">Amoxicilline 500mg arrive a peremption</p>
-          <p class="simple-list-meta">Lot L2309 - peremption dans 15 jours - il y a 2 h</p>
+          <p class="simple-list-title">{{ alertes.nom }}</p>
+          <p class="simple-list-meta">{{ alertes.peremption_proche|yesno:"Peremption proche," }} {{ alertes.date_peremption }} - {{ alertes.lot}}</p>
         </div>
       </li>
+      {% endif %}
+      {% endfor %}
+      {% for alertes in alertes %} {% if alertes.stock_faible %}
       <li class="simple-list-item">
         <div class="simple-list-icon warning">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
         </div>
         <div class="simple-list-content">
-          <p class="simple-list-title">Stock faible : Gel hydroalcoolique</p>
-          <p class="simple-list-meta">4 unites restantes (seuil : 10) - il y a 3 h</p>
+          <p class="simple-list-title">Stock faible : {{ alertes.nom }}</p>
+          <p class="simple-list-meta">{{ alertes.stock }} unites restantes (seuil : {{ alertes.seuil_alerte }}) - il y a 3 h</p>
         </div>
       </li>
-      <li class="simple-list-item">
-        <div class="simple-list-icon warning">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-        </div>
-        <div class="simple-list-content">
-          <p class="simple-list-title">Stock faible : Tensiometre digital</p>
-          <p class="simple-list-meta">2 unites restantes (seuil : 5) - il y a 5 h</p>
-        </div>
-      </li>
+      {% endif %}
+      {% endfor %}      
+      {% for ventes in ventes %} {% if ventes %}
       <li class="simple-list-item">
         <div class="simple-list-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         </div>
         <div class="simple-list-content">
           <p class="simple-list-title">Nouvelle vente enregistree</p>
-          <p class="simple-list-meta">Vente #1042 - Jean Kalombo - hier</p>
+          <p class="simple-list-meta">Vente {{ ventes.numero }} - {{ventes.client.nom}} - hier</p>
         </div>
       </li>
+      {% endif %}
+      {% endfor %}
+      {% for livraisons in livraisons %} {% if livraisons %}
       <li class="simple-list-item">
         <div class="simple-list-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
         </div>
         <div class="simple-list-content">
-          <p class="simple-list-title">Livraison recue de PharmaDistrib SARL</p>
+          <p class="simple-list-title">Livraison recue de {{livraisons.nom}}</p>
           <p class="simple-list-meta">32 references reapprovisionnees - hier</p>
         </div>
       </li>
+      {% endif %}
+      {% endfor %}
     </ul>
   </div>
 

@@ -107,33 +107,30 @@
           <a href="{% url 'notifications' %}" class="panel-link">Voir tout</a>
         </div>
         <ul class="simple-list">
+          {% for alertes in alertes %} {% if alertes.peremption_proche %}
           <li class="simple-list-item">
             <div class="simple-list-icon danger">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
             <div class="simple-list-content">
-              <p class="simple-list-title">Amoxicilline 500mg</p>
-              <p class="simple-list-meta">Peremption dans 15 jours - lot L2309</p>
+              <p class="simple-list-title">{{ alertes.nom }}</p>
+              <p class="simple-list-meta">{{ alertes.peremption_proche|yesno:"Peremption proche," }} {{ alertes.date_peremption }} - {{ alertes.lot}}</p>
             </div>
-          </li>
+          </li>  
+          {% endif %}
+          {% endfor %}
+          {% for alertes in alertes %} {% if alertes.stock_faible %}
           <li class="simple-list-item">
             <div class="simple-list-icon warning">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             </div>
             <div class="simple-list-content">
-              <p class="simple-list-title">Gel hydroalcoolique</p>
-              <p class="simple-list-meta">Stock faible - 4 unites restantes</p>
+              <p class="simple-list-title">{{ alertes.nom }}</p>
+              <p class="simple-list-meta">Stock faible - {{ alertes.stock }} unites restantes</p>
             </div>
           </li>
-          <li class="simple-list-item">
-            <div class="simple-list-icon warning">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-            </div>
-            <div class="simple-list-content">
-              <p class="simple-list-title">Tensiometre digital</p>
-              <p class="simple-list-meta">Stock faible - 2 unites restantes</p>
-            </div>
-          </li>
+          {% endif %}
+          {% endfor %}
         </ul>
       </div>
 

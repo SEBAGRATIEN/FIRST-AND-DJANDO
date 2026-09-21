@@ -1,5 +1,7 @@
 from django import forms
-from .models import Produit, Client, Fournisseur
+
+from .models import Produit, Client, Fournisseur, Vente, LigneVente
+from django.forms import BaseInlineFormSet, inlineformset_factory
 
 class ProduitForm(forms.ModelForm):
     class Meta:
@@ -38,4 +40,67 @@ class FournisseurForm(forms.ModelForm):
             'notes': forms.Textarea(attrs={
                 'placeholder': 'Composition, posologie, precautions'
             }),   
-        }       
+        } 
+
+class VenteForm(forms.ModelForm):
+   class Meta:
+      model= Vente   
+      fields =['client', 'mode_paiement', 'remise']
+
+   def __init__(self, *args, **kwargs):
+      super().__init__(*args, **kwargs)
+      self.fields['client'].empty_label  = "Client de passage"
+
+
+class LigneVenteForm(forms.ModelForm):
+   produit = forms.ModelChoiceField(
+      queryset=Produit.objects.all(), required=False,
+      empty_label="-- Choisir un produit --", 
+   )
+   quantite = forms.IntegerField(min_value=1, required=False)
+
+   class Meta:
+      model = LigneVente
+      fields =  ['produit', 'quantite']
+
+   def clean(self):
+      cleaned_data = super().clean()
+      produit = cleaned_data.get('produit')
+      quantite = cleaned_data.get('quantite')
+      if produit and not quantite:
+         raise forms.ValidationError("Indiquer une  quantinte pour ce produit.")
+      if quantite and not produit:
+         raise forms.ValidationError("Choisissez un produit pour cette ligne")
+      if produit and quantite and quantite > produit.stock:
+         raise forms.ValidationError(
+            f"Stock insuffisant pour {produit.nom} "
+            f"({produit.stock}) disponible"
+         )
+      return cleaned_data
+
+   def save(self, commit=True):
+      instance = super().save(commit=False)
+      if instance.produit:
+         instance.prix_unitaire = instance.produit.prix
+      if commit:
+         instance.save()
+      return instance
+
+class BaseLigneVenteFormSet(BaseInlineFormSet):
+   def clean(self):
+      if any(self.errors):
+         return
+      lignes_remplies = [
+         form.cleaned_data for form in self.forms
+         if form.cleaned_data and form.cleaned_data.get('produit')
+      ]
+      if not lignes_remplies:
+         raise forms.ValidationError("Ajoutez au moins un produit à la vente.")
+
+LigneVenteFormSet =  inlineformset_factory(
+   Vente, LigneVente,
+   form=LigneVenteForm,
+   formset=BaseLigneVenteFormSet,
+   extra=5,
+   can_delete=False,
+)
