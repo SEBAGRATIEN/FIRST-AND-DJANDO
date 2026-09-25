@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .forms import ProduitForm, ClientForm, FournisseurForm, VenteForm, LigneVenteFormSet
+from .forms import ProduitForm, ClientForm, FournisseurForm, VenteForm, LigneVenteFormSet 
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.contrib.auth import authenticate
@@ -38,6 +38,7 @@ def produits_form(request,pk=None):
         form = ProduitForm(instance=produit)  
 
     return render(request, 'produits/form.html', {'form': form, 'produit': produit})
+
 @require_POST
 @login_required
 def produits_delete(request,pk):
@@ -46,7 +47,7 @@ def produits_delete(request,pk):
     messages.success(request, "Produit Suprimer avec success")
     return redirect('produit_liste')       
 
-
+@login_required
 def stock_liste(request):
     produit = Produit.objects.all()
     return render(request, 'stock/liste.html', {'produits': produit})
@@ -153,12 +154,13 @@ def factures_detail(request, pk):
 def statistiques(request):
     return render(request, 'statistiques/index.html')
 
-
+@login_required
 def notifications(request):
     alertes = Produit.objects.all()
     ventes = Vente.objects.all()
     livraisons = Fournisseur.objects.all()
     return render(request, 'notifications/liste.html', {'alertes': alertes, 'ventes': ventes, 'livraisons': livraisons})
+
 
 def parametres(request):
     return render(request, 'parametres/index.html')

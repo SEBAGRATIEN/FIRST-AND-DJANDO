@@ -1,19 +1,17 @@
-# Environnement virtuel
-venv/
+
+# Django et Base de données
+db.sqlite3
+.env
+
+# Environnements virtuels et dépendances
 env/
-ENV/
+venv/
+.venv/
 
-# Django
-__pycache__/
+# Caches Python
+**/__pycache__/
 *.pyc
-db.sqlite3
-media/
-staticfiles/
 
-# VS Code
-.vscode/
-
-# Fichiers systeme
-.DS_Store
+# Fichiers statiques et médias générés
 /staticfiles/
-db.sqlite3
+/media/

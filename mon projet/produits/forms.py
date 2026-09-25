@@ -42,7 +42,7 @@ class FournisseurForm(forms.ModelForm):
             }),   
         } 
 
-class VenteForm(forms.ModelForm):
+class VenteForm(forms.ModelForm): 
    class Meta:
       model= Vente   
       fields =['client', 'mode_paiement', 'remise']
