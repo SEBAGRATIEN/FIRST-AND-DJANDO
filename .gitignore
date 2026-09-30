@@ -96,3 +96,9 @@ desktop.ini
 *.tmp
 *.sql
 *.dump
+.env
+db.sqlite3
+__pycache__/
+*.pyc
+env/
+staticfiles/
