@@ -27,16 +27,16 @@
       <div class="data-cell shrink">Statut</div>
     </div>
 
-    {% for vente in ventes %}
+    {% for ventes in ventes %}
     <div class="data-row">
       <div class="data-cell shrink">
-        <a href="{% url 'factures_detail' vente.pk %}">{{ vente.numero }}</a>
+        <a href="{% url 'factures_detail' ventes.pk %}">{{ ventes.numero }}</a>
       </div>
-      <div class="data-cell grow">{{ vente.client|default:"Client de passage" }}</div>
-      <div class="data-cell">{{ vente.date|date:"d/m/Y H:i" }}</div>
-      <div class="data-cell">{{ vente.nb_articles }}</div>
-      <div class="data-cell">{{ vente.total }} €</div>
-      <div class="data-cell shrink"><span class="status {{ vente.statut_css }}">{{ vente.get_statut_display }}</span></div>
+      <div class="data-cell grow">{{ ventes.client|default:"Client de passage" }}</div>
+      <div class="data-cell">{{ ventes.date|date:"d/m/Y H:i" }}</div>
+      <div class="data-cell">{{ ventes.nb_articles }}</div>
+      <div class="data-cell">{{ ventes.total }} €</div>
+      <div class="data-cell shrink"><span class="status {{ ventes.statut_css }}">{{ ventes.get_statut_display }}</span></div>
     </div>
     {% empty %}
     <p style="padding:16px;opacity:0.7;">Aucune vente pour le moment.</p>
