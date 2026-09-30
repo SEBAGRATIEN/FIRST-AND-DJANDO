@@ -128,10 +128,10 @@ class Vente(models.Model):
    def status_css(self):
       return {
          self.Statut.PAYEE:'active',
-         self.Statut.EN_ATTENTE:'warning',
+         self.Statut.EN_ENTENTE:'warning',
          self.Statut.IMPAYEE: 'warning',
          self.Statut.ANNULERR: 'danger',
-      }
+      }.get(self.statut, 'warning')
 
    @property
    def sous_total(self):
